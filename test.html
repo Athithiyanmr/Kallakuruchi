@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Display a map on a webpage</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/mapbox-gl-controls@0.51.0/dist/mapbox-gl-controls.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+        .map-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div class="map-overlay">
+        <h4>Select layers to display:</h4>
+        <input type="checkbox" id="waterbodies-layer" checked>
+        <label for="waterbodies-layer">Waterbodies</label>
+        <br>
+        <input type="checkbox" id="taluk-layer" checked>
+        <label for="taluk-layer">Taluk</label>
+        <br>
+        <input type="checkbox" id="railways-layer" checked>
+        <label for="railways-layer">Railways</label> 
+        <br>
+        <input type="checkbox" id="builtup-layer" checked>
+        <label for="builtup-layer">Builtup</label>             
+    </div>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYXRoaXRoaXlhbiIsImEiOiJjbGZneHRzdDEyYWVsM3htdW1iOXIwNGJnIn0.LwEQfOmfY-1FcJPgYn3oag';
+        const map = new mapboxgl.Map({
+            container: 'map', // container ID
+            // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+            style: 'mapbox://styles/mapbox/streets-v12', // style URL
+            center: [79.10,11.90], // starting position [lng, lat]
+            zoom: 9// starting zoom
+        });
+        map.on('load', function() {
+            // Add Waterbodies layer to the map
+            map.addSource('Waterbodies', {
+                type: 'vector',
+                url: 'mapbox://athithiyan.cw2871e1'
+            });
+            map.addLayer({
+                'id': 'waterbodies-layer',
+                'type': 'fill',
+                'source': 'Waterbodies',
+                'source-layer': 'shp_waterbodies-58cbvd',
+                'paint': {
+                    'fill-color': 'blue'
+                }
+            });
+            
+            // Add Taluk layer to the map
+            map.addSource('Taluk', {
+                type: 'vector',
+                url: 'mapbox://athithiyan.55320d7k'
+            });
+            map.addLayer({
+                'id': 'taluk-layer',
+                'type': 'line',
+                'source': 'Taluk',
+                'source-layer': 'shp_taluk-6cx04k',
+                'paint': {
+                    'line-color': 'black',
+                    'line-width': 1
+                }
+            });
+            // Add railways layer to the map
+            map.addSource('Railways', {
+                type: 'vector',
+                url: 'mapbox://athithiyan.826zd8sz'
+            });
+            map.addLayer({
+                'id': 'railways-layer',
+                'type': 'line',
+                'source': 'Railways',
+                'source-layer': 'shp_railways-78c1mb',
+                'paint': {
+                    'line-color': 'orange',
+                    'line-width': 1
+                }
+            });
+            // Add railways layer to the map
+            map.addSource('Builtup', {
+                type: 'vector',
+                url: 'mapbox://athithiyan.823bw9ap'
+            });
+            map.addLayer({
+                'id': 'builtup-layer',
+                'type': 'fill',
+                'source': 'Builtup',
+                'source-layer': 'Builtup-48kfz7',
+                'paint': {
+                    'fill-color': 'red'
+                }
+            });
+
+            // Add layer control to the map
+            const layerToggleControlWaterbodies = document.getElementById('waterbodies-layer');
+            const layerToggleControlTaluk = document.getElementById('taluk-layer');
+            const layerToggleControlRailways = document.getElementById('railways-layer');
+            const layerToggleControlbuiltup = document.getElementById('builtup-layer');
+            layerToggleControlWaterbodies.addEventListener('change', function () {
+                const layerId = layerToggleControlWaterbodies.getAttribute('id');
+                if (layerToggleControlWaterbodies.checked) {
+                    map.setLayoutProperty(layerId, 'visibility', 'visible');
+                } else {
+                    map.setLayoutProperty(layerId, 'visibility', 'none');
+                }
+            });
+            layerToggleControlTaluk.addEventListener('change', function () {
+                const layerId = layerToggleControlTaluk.getAttribute('id');
+                if (layerToggleControlTaluk.checked) {
+                    map.setLayoutProperty(layerId, 'visibility', 'visible');
+                } else {
+                    map.setLayoutProperty(layerId, 'visibility', 'none');
+                }
+            });
+            layerToggleControlRailways.addEventListener('change', function () {
+                const layerId = layerToggleControlRailways.getAttribute('id');
+                if (layerToggleControlRailways.checked) {
+                    map.setLayoutProperty(layerId, 'visibility', 'visible');
+                } else {
+                    map.setLayoutProperty(layerId, 'visibility', 'none');
+                }
+            });
+            layerToggleControlbuiltup.addEventListener('change', function () {
+                const layerId = layerToggleControlbuiltup.getAttribute('id');
+                if (layerToggleControlbuiltup.checked) {
+                    map.setLayoutProperty(layerId, 'visibility', 'visible');
+                } else {
+                    map.setLayoutProperty(layerId, 'visibility', 'none');
+                }
+            });
+        });
+
+        // Add zoom and rotation controls to the map
+        map.addControl(new mapboxgl.NavigationControl());
+
+        // Add geolocation control to the map
+        map.addControl(
+            new mapboxgl.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true
+                },
+                trackUserLocation: true
+            })
+        );
+    </script>
+</body>
+
+</html>
